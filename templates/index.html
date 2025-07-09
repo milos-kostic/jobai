@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Matcher</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input[type=file] { margin-bottom: 10px; }
+        .job { margin-bottom: 20px; }
+        .feedback-btn { cursor: pointer; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Upload your CV</h1>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="cvfile" accept=".pdf,.docx,.txt" required>
+        <input type="submit" value="Find Jobs">
+    </form>
+
+    {% if results %}
+        <h2>Top Job Matches:</h2>
+        {% for job, score in results %}
+            <div class="job">
+                <a href="{{ job.url }}" target="_blank"><strong>{{ job.title }}</strong></a><br>
+                Similarity: {{ "%.2f"|format(score) }}<br>
+                <button onclick="sendFeedback({{ job.id }}, 1)" class="feedback-btn">👍 Like</button>
+                <button onclick="sendFeedback({{ job.id }}, 0)" class="feedback-btn">👎 Dislike</button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <script>
+        function sendFeedback(jobId, feedback) {
+            fetch('/feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({job_id: jobId, feedback: feedback})
+            }).then(response => {
+                if(response.ok) alert('Feedback saved!');
+                else alert('Error saving feedback.');
+            });
+        }
+    </script>
+</body>
+</html>

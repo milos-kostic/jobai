@@ -1,0 +1,5 @@
+flask
+sentence-transformers
+pdfminer.six
+python-docx
+numpy
